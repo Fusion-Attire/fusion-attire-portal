@@ -72,14 +72,19 @@
     .rank-2 { background: #e2e3e5; }
     .rank-3 { background: #d4edda; }
     .commission { font-weight: 600; color: #28a745; }
-    .action-btn {
+    .action-btn, .view-rep-btn {
       background: #397DFF;
       color: white;
       border: none;
       padding: 5px 12px;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 12px;
     }
+    .view-rep-btn {
+      background: #28a745;
+    }
+    .view-rep-btn:hover { background: #1e7e34; }
     .action-btn:hover { background: #2a5fc0; }
     .modal {
       position: fixed;
@@ -95,7 +100,7 @@
       background: white;
       padding: 24px;
       border-radius: 16px;
-      max-width: 500px;
+      max-width: 550px;
       width: 90%;
       max-height: 80%;
       overflow-y: auto;
@@ -109,6 +114,43 @@
     }
     .close:hover { color: #000; }
     .loading { text-align: center; padding: 20px; color: #999; }
+    .rep-detail-section {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    .rep-detail-section h4 {
+      margin-bottom: 10px;
+      color: #2a5298;
+    }
+    .rep-detail-row {
+      display: flex;
+      margin-bottom: 8px;
+    }
+    .rep-detail-label {
+      width: 140px;
+      font-weight: 600;
+      color: #666;
+    }
+    .rep-detail-value {
+      flex: 1;
+      color: #1a1a2e;
+    }
+    .designer-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .designer-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .designer-name {
+      font-weight: 600;
+    }
+    .designer-status {
+      font-size: 12px;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -153,7 +195,7 @@
             <th>Total Commission</th>
             <th>Commission Owed</th>
             <th>Passed</th>
-            <th>Action</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="repsListBody">
@@ -183,18 +225,23 @@
   <script>
     // ⚠️ MANUAL ACCESS TOKEN - Replace when expired ⚠️
     const ZOHO_ACCESS_TOKEN = "1000.04ab1e621da2af6ef78d69909bba26b9.74a3e61bc5fb7ab70c3cb8e5878ba7c4";
+    const ZOHO_API_DOMAIN = "https://www.zohoapis.com";
+    
+    // Store full rep data for modal access
+    let allRepsData = [];
     
     async function fetchRepsAndLeads() {
       try {
         // Fetch all reps from Sales Reps module
-        const repsResponse = await fetch('https://www.zohoapis.com/crm/v2/Sales_Reps', {
+        const repsResponse = await fetch(`${ZOHO_API_DOMAIN}/crm/v2/Sales_Reps`, {
           headers: { 'Authorization': `Zoho-oauthtoken ${ZOHO_ACCESS_TOKEN}` }
         });
         const repsData = await repsResponse.json();
         const reps = repsData.data || [];
+        allRepsData = reps;
         
         // Fetch all leads from Leads module
-        const leadsResponse = await fetch('https://www.zohoapis.com/crm/v2/Leads', {
+        const leadsResponse = await fetch(`${ZOHO_API_DOMAIN}/crm/v2/Leads`, {
           headers: { 'Authorization': `Zoho-oauthtoken ${ZOHO_ACCESS_TOKEN}` }
         });
         const leadsData = await leadsResponse.json();
@@ -212,7 +259,8 @@
           
           return {
             ...rep,
-            passed, conditional, failed, pending, total, commission
+            passed, conditional, failed, pending, total, commission,
+            designers: repLeads // Store designers for modal view
           };
         });
         
@@ -233,17 +281,19 @@
         repStats.forEach(rep => {
           repsListBody.innerHTML += `
             <tr>
-              <td>${rep.Rep_ID || '-'}</td>
+              <td><strong>${rep.Rep_ID || '-'}<\/strong></td>
               <td>${rep.Full_Name || '-'}</td>
               <td>${rep.Email || '-'}</td>
               <td>${rep.Phone || '-'}</td>
               <td>${rep.Territory || '-'}</td>
               <td>${rep.Status || '-'}</td>
-              <td>P${rep.Commission_Rate || 0}</td>
-              <td>P${rep.Total_Commission || 0}</td>
-              <td>P${rep.Commission_Owed || 0}</td>
-              <td>${rep.passed}</td>
-              <td><button class="action-btn" onclick='viewRepDetails(${JSON.stringify(rep)})'>View</button></td>
+              <td>P${rep.Commission_Rate || 0}比
+              <td>P${rep.Total_Commission || 0}比
+              <td>P${rep.Commission_Owed || 0}比
+              <td>${rep.passed}比
+              <td>
+                <button class="view-rep-btn" onclick='showRepDetails(${JSON.stringify(rep)})'>📋 View</button>
+              </td>
             </tr>
           `;
         });
@@ -260,7 +310,7 @@
           leaderboardBody.innerHTML += `
             <tr class="${rankClass}">
               <td>${idx + 1}</td>
-              <td>${rep.Rep_ID || '-'}</td>
+              <td><button class="view-rep-btn" style="background:none; color:#2a5298; text-decoration:underline; padding:0;" onclick='showRepDetails(${JSON.stringify(rep)})'>${rep.Rep_ID || '-'}<\/button></td>
               <td>${rep.Full_Name || '-'}</td>
               <td>${rep.passed}</td>
               <td class="commission">P${rep.commission}</td>
@@ -270,32 +320,123 @@
         
       } catch (error) {
         console.error('Error fetching data:', error);
-        document.getElementById('repsListBody').innerHTML = '<tr><td colspan="11" class="loading">Error loading data. Check API token.</td></tr>';
+        document.getElementById('repsListBody').innerHTML = '<tr><td colspan="11" class="loading">Error loading data. Check API token.<\/td><\/tr>';
       }
     }
     
-    function viewRepDetails(rep) {
-      document.getElementById('modalRepName').innerText = rep.Full_Name || rep.Rep_ID;
+    // Show detailed rep information in modal
+    function showRepDetails(rep) {
+      const totalDesigners = rep.designers ? rep.designers.length : rep.total || 0;
+      const passed = rep.passed || 0;
+      const conditional = rep.conditional || 0;
+      const failed = rep.failed || 0;
+      const pending = rep.pending || 0;
+      const commissionRate = rep.Commission_Rate || 100;
+      const totalCommission = rep.Total_Commission || 0;
+      const commissionPaid = rep.Commission_Paid || 0;
+      const commissionOwed = rep.Commission_Owed || 0;
+      
+      // Build designers list HTML
+      let designersHtml = '';
+      if (rep.designers && rep.designers.length > 0) {
+        designersHtml = '<div class="designer-list">';
+        rep.designers.forEach(designer => {
+          let statusClass = '';
+          let statusText = designer.Lead_Status || 'Unknown';
+          if (designer.Lead_Status === 'Fusion Verified') statusClass = '✅ Pass';
+          else if (designer.Lead_Status === 'Conditional Pass') statusClass = '⚠️ Conditional';
+          else if (designer.Lead_Status === 'Failed — Support Needed') statusClass = '❌ Failed';
+          else if (designer.Lead_Status === 'KYC Submitted') statusClass = '⏳ Pending';
+          else statusClass = designer.Lead_Status;
+          
+          const firstName = designer.First_Name || '';
+          const lastName = designer.Last_Name || '';
+          const fullName = `${firstName} ${lastName}`.trim() || '—';
+          
+          designersHtml += `
+            <div class="designer-item">
+              <div class="designer-name">${fullName}</div>
+              <div class="designer-status">${statusText} | Score: ${designer.Fusion_Verified_Score || '—'} | Commission: ${designer.Lead_Status === 'Fusion Verified' ? `P${commissionRate}` : '—'}</div>
+            </div>
+          `;
+        });
+        designersHtml += '</div>';
+      } else {
+        designersHtml = '<p>No designers onboarded yet.</p>';
+      }
+      
+      document.getElementById('modalRepName').innerHTML = `${rep.Full_Name || rep.Rep_ID} <span style="font-size:14px; color:#666;">(${rep.Rep_ID})</span>`;
       document.getElementById('modalRepDetails').innerHTML = `
-        <div style="margin-bottom: 15px;">
-          <p><strong>📛 Rep ID:</strong> ${rep.Rep_ID || '-'}</p>
-          <p><strong>📧 Email:</strong> ${rep.Email || '-'}</p>
-          <p><strong>📱 Phone:</strong> ${rep.Phone || '-'}</p>
-          <p><strong>📍 Territory:</strong> ${rep.Territory || '-'}</p>
-          <p><strong>📅 Status:</strong> ${rep.Status || '-'}</p>
-          <p><strong>💰 Commission Rate:</strong> P${rep.Commission_Rate || 0} per pass</p>
-          <p><strong>🏆 Total Commission Earned:</strong> P${rep.Total_Commission || 0}</p>
-          <p><strong>💸 Commission Paid:</strong> P${rep.Commission_Paid || 0}</p>
-          <p><strong>📊 Commission Owed:</strong> P${rep.Commission_Owed || 0}</p>
+        <div class="rep-detail-section">
+          <h4>📋 Contact Information</h4>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">📧 Email:</div>
+            <div class="rep-detail-value">${rep.Email || 'Not set'}</div>
+          </div>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">📱 Phone:</div>
+            <div class="rep-detail-value">${rep.Phone || 'Not set'}</div>
+          </div>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">📍 Territory:</div>
+            <div class="rep-detail-value">${rep.Territory || 'Not set'}</div>
+          </div>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">📅 Status:</div>
+            <div class="rep-detail-value">${rep.Status || 'Active'}</div>
+          </div>
         </div>
-        <div style="border-top: 1px solid #eee; padding-top: 15px;">
-          <h4>📋 Designers Onboarded (${rep.total || 0})</h4>
-          <p>✅ <strong style="color: green;">Passed:</strong> ${rep.passed || 0}</p>
-          <p>⚠️ <strong style="color: orange;">Conditional:</strong> ${rep.conditional || 0}</p>
-          <p>❌ <strong style="color: red;">Failed:</strong> ${rep.failed || 0}</p>
-          <p>⏳ <strong style="color: blue;">Pending:</strong> ${rep.pending || 0}</p>
+        
+        <div class="rep-detail-section">
+          <h4>💰 Commission Information</h4>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">Commission Rate:</div>
+            <div class="rep-detail-value">P${commissionRate} per pass</div>
+          </div>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">Total Commission Earned:</div>
+            <div class="rep-detail-value">P${totalCommission}</div>
+          </div>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">Commission Paid:</div>
+            <div class="rep-detail-value">P${commissionPaid}</div>
+          </div>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">Commission Owed:</div>
+            <div class="rep-detail-value"><strong style="color:#28a745;">P${commissionOwed}</strong></div>
+          </div>
+        </div>
+        
+        <div class="rep-detail-section">
+          <h4>📊 Performance Summary</h4>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">Total Designers:</div>
+            <div class="rep-detail-value">${totalDesigners}</div>
+          </div>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">✅ Fusion Verified (Passed):</div>
+            <div class="rep-detail-value" style="color: green;">${passed}</div>
+          </div>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">⚠️ Conditional Pass:</div>
+            <div class="rep-detail-value" style="color: orange;">${conditional}</div>
+          </div>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">❌ Failed — Support Needed:</div>
+            <div class="rep-detail-value" style="color: red;">${failed}</div>
+          </div>
+          <div class="rep-detail-row">
+            <div class="rep-detail-label">⏳ KYC Pending:</div>
+            <div class="rep-detail-value">${pending}</div>
+          </div>
+        </div>
+        
+        <div class="rep-detail-section">
+          <h4>📋 Designers Onboarded (${totalDesigners})</h4>
+          ${designersHtml}
         </div>
       `;
+      
       document.getElementById('repModal').style.display = 'flex';
     }
     
