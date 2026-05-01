@@ -157,20 +157,19 @@
           </tr>
         </thead>
         <tbody id="repsListBody">
-          <tr><td colspan="11" class="loading">Loading reps...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+          <tr><td colspan="11" class="loading">Loading reps...<\/td><\/tr>
+        <\/tbody>
+      <\/table>
+    <\/div>
+  <\/div>
 
   <div class="leaderboard">
     <h2>🏆 Rep Leaderboard</h2>
     <table id="leaderboardTable">
       <thead><tr><th>Rank</th><th>Rep ID</th><th>Rep Name</th><th>Passed</th><th>Commission</th></tr></thead>
-      <tbody><tr><td colspan="5" class="loading">Loading...</td></tr>
-      </tbody>
-    </table>
-  </div>
+      <tbody><tr><td colspan="5" class="loading">Loading...<\/td><\/tr><\/tbody>
+    <\/table>
+  <\/div>
 
   <!-- Rep Details Modal -->
   <div id="repModal" style="display:none;" class="modal">
@@ -178,13 +177,13 @@
       <span class="close" onclick="closeModal()">&times;</span>
       <h3 id="modalRepName"></h3>
       <div id="modalRepDetails"></div>
-    </div>
-  </div>
+    <\/div>
+  <\/div>
 
   <script>
-    const CLIENT_ID = "1000.HUWBDXNW6S4SO3W1KSP7A6DL8T32DP";
-    const CLIENT_SECRET = "88a0904c73c9847226f30485f3b97e2c8d18b394c8";
-    const REFRESH_TOKEN = "YOUR_REFRESH_TOKEN_FROM_GENERATOR";
+    // ⚠️ MANUAL ACCESS TOKEN - Replace when expired ⚠️
+    const ZOHO_ACCESS_TOKEN = "1000.04ab1e621da2af6ef78d69909bba26b9.74a3e61bc5fb7ab70c3cb8e5878ba7c4";
+    
     async function fetchRepsAndLeads() {
       try {
         // Fetch all reps from Sales Reps module
