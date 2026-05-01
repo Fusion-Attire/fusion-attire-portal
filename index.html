@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Fusion Attire | Rep Login</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-container {
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 32px;
+      padding: 40px 32px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .logo {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    input {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    .footer-link {
+      margin-top: 20px;
+      font-size: 13px;
+    }
+
+    .footer-link a {
+      color: #667eea;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="logo">
+  <img src="fa.jpg" alt="Fusion Attire" style="width: 60px; height: 60px; border-radius: 16px;">
+</div>
+      <h1>Fusion Attire</h1>
+      <div class="subtitle">Field Representative Portal</div>
+      <input type="text" id="repIdInput" placeholder="Enter your Rep ID" autocomplete="off">
+      <button onclick="login()">Continue →</button>
+      <div class="footer-link">
+        <a href="admin-login.html">🔒 Admin login</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function login() {
+      const repId = document.getElementById('repIdInput').value.trim();
+      if (!repId) {
+        alert('Please enter your Rep ID');
+        return;
+      }
+      localStorage.setItem('repId', repId);
+      window.location.href = 'rep-dashboard.html';
+    }
+
+    // If already logged in, go to dashboard
+    const savedRepId = localStorage.getItem('repId');
+    if (savedRepId) {
+      window.location.href = 'rep-dashboard.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fusion Attire | Admin Login</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-card {
+      background: white;
+      border-radius: 32px;
+      padding: 40px 32px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+    .logo { font-size: 48px; margin-bottom: 16px; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    .subtitle { color: #666; margin-bottom: 32px; font-size: 14px; }
+    input {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 16px;
+      margin-bottom: 16px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #2a5298;
+    }
+    button {
+      width: 100%;
+      padding: 16px;
+      background: #2a5298;
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .back-link {
+      margin-top: 20px;
+      font-size: 13px;
+    }
+    .back-link a { color: #2a5298; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+   <div class="logo">
+  <img src="fa.jpg" alt="Fusion Attire" style="width: 60px; height: 60px; border-radius: 16px;">
+</div>
+    <h1>Admin Access</h1>
+    <div class="subtitle">Internal team only</div>
+    <input type="password" id="adminPassword" placeholder="Enter admin password">
+    <button onclick="login()">Access Dashboard →</button>
+    <div class="back-link"><a href="index.html">← Back to rep login</a></div>
+  </div>
+
+  <script>
+    // ⚠️ CHANGE THIS PASSWORD ⚠️
+    const ADMIN_PASSWORD = "FusionAdmin2026";
+    
+    function login() {
+      const password = document.getElementById('adminPassword').value;
+      if (password === ADMIN_PASSWORD) {
+        localStorage.setItem('adminAuth', 'true');
+        window.location.href = 'admin-dashboard.html';
+      } else {
+        alert('Incorrect password');
+      }
+    }
+  </script>
+</body>
+</html>
