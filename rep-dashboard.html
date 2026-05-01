@@ -347,7 +347,7 @@
       const total = leads.length;
       const passed = leads.filter(l => l.Lead_Status === 'Fusion Verified').length;
       const pending = leads.filter(l => l.Lead_Status === 'KYC Submitted').length;
-      const commission = passed * 100;
+      const commission = passed * 50;
       
       document.getElementById('totalCount').innerText = total;
       document.getElementById('passedCount').innerText = passed;
