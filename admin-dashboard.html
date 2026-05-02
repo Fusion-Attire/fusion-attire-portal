@@ -1,317 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fusion Attire | Admin Dashboard</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f7fb;
-      padding: 20px;
-    }
-    .header {
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      color: white;
-      padding: 24px;
-      border-radius: 24px;
-      margin-bottom: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    h1 { font-size: 24px; }
-    .logout-btn {
-      background: rgba(255,255,255,0.2);
-      border: none;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .stat-card {
-      background: white;
-      padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .stat-value {
-      font-size: 32px;
-      font-weight: 800;
-      color: #2a5298;
-    }
-    .stat-label { color: #666; font-size: 13px; margin-top: 4px; }
-    .reps-section {
-      background: white;
-      border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    h2 { font-size: 18px; margin-bottom: 16px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-    th { color: #666; font-weight: 600; font-size: 13px; }
-    .rank-1 { background: #fff3cd; font-weight: 700; }
-    .rank-2 { background: #e2e3e5; }
-    .rank-3 { background: #d4edda; }
-    .commission { font-weight: 600; color: #28a745; }
-    .view-rep-btn {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 5px 12px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .modal-content {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      max-width: 550px;
-      width: 90%;
-      max-height: 80%;
-      overflow-y: auto;
-    }
-    .close {
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-      color: #aaa;
-    }
-    .close:hover { color: #000; }
-    .loading { text-align: center; padding: 20px; color: #999; }
-    .rep-detail-section {
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #eee;
-    }
-    .rep-detail-section h4 { margin-bottom: 10px; color: #2a5298; }
-    .rep-detail-row { display: flex; margin-bottom: 8px; }
-    .rep-detail-label { width: 140px; font-weight: 600; color: #666; }
-    .rep-detail-value { flex: 1; color: #1a1a2e; }
-    .designer-list { max-height: 300px; overflow-y: auto; }
-    .designer-item { padding: 10px; border-bottom: 1px solid #eee; }
-    .designer-name { font-weight: 600; }
-    .designer-status { font-size: 12px; margin-top: 4px; }
-  </style>
+    <title>Fusion Attire Dashboard</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #2a5298; color: white; }
+        .stats { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+        .stat-card { background: #f5f7fb; padding: 15px; border-radius: 8px; min-width: 150px; }
+        .stat-value { font-size: 28px; font-weight: bold; color: #2a5298; }
+        .loading { text-align: center; padding: 20px; color: #666; }
+        .error { color: red; text-align: center; padding: 20px; }
+    </style>
 </head>
 <body>
-  <div class="header">
     <h1>👑 Fusion Attire — Team Dashboard</h1>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-value" id="totalReps">0</div><div class="stat-label">Active Reps</div></div>
-    <div class="stat-card"><div class="stat-value" id="totalDesigners">0</div><div class="stat-label">Total Designers</div></div>
-    <div class="stat-card"><div class="stat-value" id="totalPassed">0</div><div class="stat-label">Fusion Verified</div></div>
-    <div class="stat-card"><div class="stat-value" id="totalCommissions">P0</div><div class="stat-label">Total Commission Owed</div></div>
-  </div>
-
-  <div class="reps-section">
-    <h2>👥 Sales Reps Management</h2>
-    <div class="table-container" style="overflow-x: auto;">
-      <table id="repsListTable">
-        <thead><tr><th>Rep ID</th><th>Full Name</th><th>Email</th><th>Phone</th><th>Territory</th><th>Status</th><th>Commission Rate</th><th>Total Commission</th><th>Commission Owed</th><th>Passed</th><th>Actions</th></tr></thead>
-        <tbody id="repsListBody"><tr><td colspan="11" class="loading">Loading reps...</td></tr></tbody>
-      </table>
+    <div class="stats">
+        <div class="stat-card"><div class="stat-value" id="totalReps">0</div><div>Active Reps</div></div>
+        <div class="stat-card"><div class="stat-value" id="totalDesigners">0</div><div>Total Designers</div></div>
+        <div class="stat-card"><div class="stat-value" id="totalPassed">0</div><div>Fusion Verified</div></div>
+        <div class="stat-card"><div class="stat-value" id="totalCommissions">P0</div><div>Total Commission Owed</div></div>
     </div>
-  </div>
+    <h2>Sales Reps Management</h2>
+    <div id="tableContainer"></div>
 
-  <div class="leaderboard">
-    <h2>🏆 Rep Leaderboard</h2>
-    <table id="leaderboardTable">
-      <thead><tr><th>Rank</th><th>Rep ID</th><th>Rep Name</th><th>Passed</th><th>Commission</th></tr></thead>
-      <tbody id="leaderboardBody"><tr><td colspan="5" class="loading">Loading...</td></tr></tbody>
-    </table>
-  </div>
-
-  <div id="repModal" style="display:none;" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h3 id="modalRepName"></h3>
-      <div id="modalRepDetails"></div>
+    <script>
+        // REPLACE THIS WITH YOUR MAKE.COM WEBHOOK URL
+        const MAKE_WEBHOOK_URL = "<!DOCTYPE html>
+<html>
+<head>
+    <title>Fusion Attire Dashboard</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #2a5298; color: white; }
+        .stats { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+        .stat-card { background: #f5f7fb; padding: 15px; border-radius: 8px; min-width: 150px; }
+        .stat-value { font-size: 28px; font-weight: bold; color: #2a5298; }
+        .loading { text-align: center; padding: 20px; color: #666; }
+        .error { color: red; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <h1>👑 Fusion Attire — Team Dashboard</h1>
+    <div class="stats">
+        <div class="stat-card"><div class="stat-value" id="totalReps">0</div><div>Active Reps</div></div>
+        <div class="stat-card"><div class="stat-value" id="totalDesigners">0</div><div>Total Designers</div></div>
+        <div class="stat-card"><div class="stat-value" id="totalPassed">0</div><div>Fusion Verified</div></div>
+        <div class="stat-card"><div class="stat-value" id="totalCommissions">P0</div><div>Total Commission Owed</div></div>
     </div>
-  </div>
+    <h2>Sales Reps Management</h2>
+    <div id="tableContainer"></div>
 
-  <script>
-    // Working token and API
-    const ZOHO_ACCESS_TOKEN = "1000.9634cdb382da090ca84fde3199188244.1d8695a87d7f8a2692181ca1eba6356d";
-    // Use CORS proxy to avoid browser blocking
-    const PROXY = "https://cors-anywhere.herokuapp.com/";
-    const ZOHO_API_DOMAIN = "https://www.zohoapis.com";
-    
-    let allRepsData = [];
-    
-    async function fetchAPI(endpoint) {
-      const url = `${PROXY}${ZOHO_API_DOMAIN}/crm/v2/${endpoint}`;
-      const response = await fetch(url, {
-        headers: { 'Authorization': `Zoho-oauthtoken ${ZOHO_ACCESS_TOKEN}` }
-      });
-      return await response.json();
-    }
-    
-    async function fetchRepsAndLeads() {
-      try {
-        // Show loading
-        document.getElementById('repsListBody').innerHTML = '<tr><td colspan="11" class="loading">Loading reps...</td></tr>';
+    <script>
+        // REPLACE THIS WITH YOUR MAKE.COM WEBHOOK URL
+        const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/mkdad48n75o3tt016n85a3qina52924q";
         
-        // Fetch data via proxy
-        const repsData = await fetchAPI('Sales_Rep');
-        const leadsData = await fetchAPI('Leads');
+        async function callMake(endpoint) {
+            const response = await fetch(MAKE_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ endpoint: endpoint })
+            });
+            return await response.json();
+        }
         
-        const reps = repsData.data || [];
-        const allLeads = leadsData.data || [];
-        allRepsData = reps;
+        async function loadDashboard() {
+            const container = document.getElementById('tableContainer');
+            container.innerHTML = '<div class="loading">Loading...</div>';
+            
+            try {
+                const [reps, leads] = await Promise.all([
+                    callMake('Sales_Rep'),
+                    callMake('Leads')
+                ]);
+                
+                // Handle Zoho response structure
+                const repsData = reps.data || [];
+                const leadsData = leads.data || [];
+                
+                // Update stats
+                const activeReps = repsData.filter(r => r.Status === 'Active').length;
+                const totalDesigners = leadsData.length;
+                const totalPassed = leadsData.filter(l => l.Lead_Status === 'Fusion Verified').length;
+                const totalCommissions = repsData.reduce((sum, r) => sum + (r.Commission_Owed || 0), 0);
+                
+                document.getElementById('totalReps').innerText = activeReps;
+                document.getElementById('totalDesigners').innerText = totalDesigners;
+                document.getElementById('totalPassed').innerText = totalPassed;
+                document.getElementById('totalCommissions').innerText = 'P' + totalCommissions;
+                
+                // Build table
+                let html = `<table><thead><tr><th>Rep ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Territory</th><th>Status</th><th>Commission Owed</th><th>Passed</th></tr></thead><tbody>`;
+                
+                repsData.forEach(rep => {
+                    const repPassed = leadsData.filter(l => l.Rep_ID === rep.Rep_ID && l.Lead_Status === 'Fusion Verified').length;
+                    html += `<tr>
+                        <table>${rep.Rep_ID || '-'}</td>
+                        <td>${rep.Name || rep.Full_Name || '-'}</td>
+                        <td>${rep.Email || '-'}</td>
+                        <td>${rep.Phone || '-'}</td>
+                        <td>${rep.Territory_of_Work || '-'}</td>
+                        <td>${rep.Status || '-'}</td>
+                        <td>P${rep.Commission_Owed || 0}</td>
+                        <td>${repPassed}</td>
+                    </tr>`;
+                });
+                
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+                
+            } catch (error) {
+                container.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                console.error('Error:', error);
+            }
+        }
         
-        const repStats = reps.map(rep => {
-          const repLeads = allLeads.filter(lead => lead.Rep_ID === rep.Rep_ID);
-          const passed = repLeads.filter(l => l.Lead_Status === 'Fusion Verified').length;
-          const conditional = repLeads.filter(l => l.Lead_Status === 'Conditional Pass').length;
-          const failed = repLeads.filter(l => l.Lead_Status === 'Failed — Support Needed').length;
-          const pending = repLeads.filter(l => l.Lead_Status === 'KYC Submitted').length;
-          const total = repLeads.length;
-          const commission = (rep.Commission_rate || 100) * passed;
-          return { ...rep, passed, conditional, failed, pending, total, commission, designers: repLeads };
-        });
+        loadDashboard();
+    </script>
+</body>
+</html>";
         
-        // Update stats
-        document.getElementById('totalReps').innerText = reps.filter(r => r.Status === 'Active').length;
-        document.getElementById('totalDesigners').innerText = repStats.reduce((s, r) => s + r.total, 0);
-        document.getElementById('totalPassed').innerText = repStats.reduce((s, r) => s + r.passed, 0);
-        document.getElementById('totalCommissions').innerText = 'P' + repStats.reduce((s, r) => s + r.commission, 0);
+        async function callMake(endpoint) {
+            const response = await fetch(MAKE_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ endpoint: endpoint })
+            });
+            return await response.json();
+        }
         
-        // Populate table
-        const tbody = document.getElementById('repsListBody');
-        tbody.innerHTML = '';
-        repStats.forEach(rep => {
-          tbody.innerHTML += `
-            <tr>
-              <td><strong>${rep.Rep_ID || '-'}</strong></td>
-              <td>${rep.Name || rep.Full_Name || '-'}</td>
-              <td>${rep.Email || '-'}</td>
-              <td>${rep.Phone || '-'}</td>
-              <td>${rep.Territory_of_Work || '-'}</td>
-              <td>${rep.Status || '-'}</td>
-              <td>P${rep.Commission_rate || 0}</td>
-              <td>P${rep.Total_Commission || 0}</td>
-              <td>P${rep.Commission_Owed || 0}</td>
-              <td>${rep.passed}</td>
-              <td><button class="view-rep-btn" onclick='showRepDetails(${JSON.stringify(rep)})'>View</button></td>
-            </tr>
-          `;
-        });
+        async function loadDashboard() {
+            const container = document.getElementById('tableContainer');
+            container.innerHTML = '<div class="loading">Loading...</div>';
+            
+            try {
+                const [reps, leads] = await Promise.all([
+                    callMake('Sales_Rep'),
+                    callMake('Leads')
+                ]);
+                
+                // Handle Zoho response structure
+                const repsData = reps.data || [];
+                const leadsData = leads.data || [];
+                
+                // Update stats
+                const activeReps = repsData.filter(r => r.Status === 'Active').length;
+                const totalDesigners = leadsData.length;
+                const totalPassed = leadsData.filter(l => l.Lead_Status === 'Fusion Verified').length;
+                const totalCommissions = repsData.reduce((sum, r) => sum + (r.Commission_Owed || 0), 0);
+                
+                document.getElementById('totalReps').innerText = activeReps;
+                document.getElementById('totalDesigners').innerText = totalDesigners;
+                document.getElementById('totalPassed').innerText = totalPassed;
+                document.getElementById('totalCommissions').innerText = 'P' + totalCommissions;
+                
+                // Build table
+                let html = `<table><thead><tr><th>Rep ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Territory</th><th>Status</th><th>Commission Owed</th><th>Passed</th></tr></thead><tbody>`;
+                
+                repsData.forEach(rep => {
+                    const repPassed = leadsData.filter(l => l.Rep_ID === rep.Rep_ID && l.Lead_Status === 'Fusion Verified').length;
+                    html += `<tr>
+                        <table>${rep.Rep_ID || '-'}</td>
+                        <td>${rep.Name || rep.Full_Name || '-'}</td>
+                        <td>${rep.Email || '-'}</td>
+                        <td>${rep.Phone || '-'}</td>
+                        <td>${rep.Territory_of_Work || '-'}</td>
+                        <td>${rep.Status || '-'}</td>
+                        <td>P${rep.Commission_Owed || 0}</td>
+                        <td>${repPassed}</td>
+                    </tr>`;
+                });
+                
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+                
+            } catch (error) {
+                container.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                console.error('Error:', error);
+            }
+        }
         
-        // Leaderboard
-        const sorted = [...repStats].sort((a, b) => b.passed - a.passed);
-        const leaderboardBody = document.getElementById('leaderboardBody');
-        leaderboardBody.innerHTML = '';
-        sorted.slice(0, 10).forEach((rep, idx) => {
-          leaderboardBody.innerHTML += `
-            <tr>
-              <td>${idx + 1}</td>
-              <td>${rep.Rep_ID || '-'}</td>
-              <td>${rep.Name || rep.Full_Name || '-'}</td>
-              <td>${rep.passed}</td>
-              <td class="commission">P${rep.commission}</td>
-            </tr>
-          `;
-        });
-        
-      } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('repsListBody').innerHTML = '<tr><td colspan="11" class="loading">Error loading data. Make sure you have activated CORS proxy: <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank">Click here to activate</a></td></tr>';
-      }
-    }
-    
-    function showRepDetails(rep) {
-      const totalDesigners = rep.designers ? rep.designers.length : rep.total || 0;
-      const passed = rep.passed || 0;
-      const conditional = rep.conditional || 0;
-      const failed = rep.failed || 0;
-      const pending = rep.pending || 0;
-      const commissionRate = rep.Commission_rate || 100;
-      const totalCommission = rep.Total_Commission || 0;
-      const commissionPaid = rep.Commission_Paid || 0;
-      const commissionOwed = rep.Commission_Owed || 0;
-      
-      let designersHtml = '';
-      if (rep.designers && rep.designers.length > 0) {
-        designersHtml = '<div class="designer-list">';
-        rep.designers.forEach(designer => {
-          let statusText = designer.Lead_Status || 'Unknown';
-          if (designer.Lead_Status === 'Fusion Verified') statusText = '✅ Pass';
-          else if (designer.Lead_Status === 'Conditional Pass') statusText = '⚠️ Conditional';
-          else if (designer.Lead_Status === 'Failed — Support Needed') statusText = '❌ Failed';
-          else if (designer.Lead_Status === 'KYC Submitted') statusText = '⏳ Pending';
-          const firstName = designer.First_Name || '';
-          const lastName = designer.Last_Name || '';
-          const fullName = `${firstName} ${lastName}`.trim() || '—';
-          designersHtml += `<div class="designer-item"><div class="designer-name">${fullName}</div><div class="designer-status">${statusText} | Score: ${designer.Fusion_Verified_Score || '—'}</div></div>`;
-        });
-        designersHtml += '</div>';
-      } else {
-        designersHtml = '<p>No designers onboarded yet.</p>';
-      }
-      
-      document.getElementById('modalRepName').innerHTML = `${rep.Name || rep.Full_Name || rep.Rep_ID} <span style="font-size:14px; color:#666;">(${rep.Rep_ID})</span>`;
-      document.getElementById('modalRepDetails').innerHTML = `
-        <div class="rep-detail-section"><h4>Contact Information</h4>
-          <div class="rep-detail-row"><div class="rep-detail-label">Email:</div><div class="rep-detail-value">${rep.Email || 'Not set'}</div></div>
-          <div class="rep-detail-row"><div class="rep-detail-label">Phone:</div><div class="rep-detail-value">${rep.Phone || 'Not set'}</div></div>
-          <div class="rep-detail-row"><div class="rep-detail-label">Territory:</div><div class="rep-detail-value">${rep.Territory_of_Work || 'Not set'}</div></div>
-          <div class="rep-detail-row"><div class="rep-detail-label">Status:</div><div class="rep-detail-value">${rep.Status || 'Active'}</div></div>
-        </div>
-        <div class="rep-detail-section"><h4>Commission Information</h4>
-          <div class="rep-detail-row"><div class="rep-detail-label">Commission Rate:</div><div class="rep-detail-value">P${commissionRate} per pass</div></div>
-          <div class="rep-detail-row"><div class="rep-detail-label">Total Commission Earned:</div><div class="rep-detail-value">P${totalCommission}</div></div>
-          <div class="rep-detail-row"><div class="rep-detail-label">Commission Paid:</div><div class="rep-detail-value">P${commissionPaid}</div></div>
-          <div class="rep-detail-row"><div class="rep-detail-label">Commission Owed:</div><div class="rep-detail-value"><strong style="color:#28a745;">P${commissionOwed}</strong></div></div>
-        </div>
-        <div class="rep-detail-section"><h4>Performance Summary</h4>
-          <div class="rep-detail-row"><div class="rep-detail-label">Total Designers:</div><div class="rep-detail-value">${totalDesigners}</div></div>
-          <div class="rep-detail-row"><div class="rep-detail-label">Passed:</div><div class="rep-detail-value" style="color:green;">${passed}</div></div>
-          <div class="rep-detail-row"><div class="rep-detail-label">Conditional:</div><div class="rep-detail-value" style="color:orange;">${conditional}</div></div>
-          <div class="rep-detail-row"><div class="rep-detail-label">Failed:</div><div class="rep-detail-value" style="color:red;">${failed}</div></div>
-          <div class="rep-detail-row"><div class="rep-detail-label">Pending:</div><div class="rep-detail-value">${pending}</div></div>
-        </div>
-        <div class="rep-detail-section"><h4>Designers Onboarded (${totalDesigners})</h4>${designersHtml}</div>
-      `;
-      document.getElementById('repModal').style.display = 'flex';
-    }
-    
-    function closeModal() { document.getElementById('repModal').style.display = 'none'; }
-    function logout() { localStorage.removeItem('adminAuth'); window.location.href = 'admin-login.html'; }
-    
-    // Check auth and activate CORS proxy
-    if (!localStorage.getItem('adminAuth')) {
-      window.location.href = 'admin-login.html';
-    } else {
-      // Show instructions if CORS proxy not activated
-      fetchRepsAndLeads();
-    }
-  </script>
+        loadDashboard();
+    </script>
 </body>
 </html>
