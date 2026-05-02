@@ -223,8 +223,8 @@
   <\/div>
 
   <script>
-    // ⚠️ MANUAL ACCESS TOKEN - Replace when expired ⚠️
-    const ZOHO_ACCESS_TOKEN = "1000.212ff2ffe97851d57150214cd377bc0b.376e4b5a2ac86704ef99e3e7a9174588";
+    // UPDATED: Working access token and correct API endpoint
+    const ZOHO_ACCESS_TOKEN = "1000.9634cdb382da090ca84fde3199188244.1d8695a87d7f8a2692181ca1eba6356d";
     const ZOHO_API_DOMAIN = "https://www.zohoapis.com";
     
     // Store full rep data for modal access
@@ -232,8 +232,8 @@
     
     async function fetchRepsAndLeads() {
       try {
-        // Fetch all reps from Sales Reps module
-        const repsResponse = await fetch(`${ZOHO_API_DOMAIN}/crm/v2/Sales_Reps`, {
+        // Fetch all reps from Sales Rep module (API name is Sales_Rep, not Sales_Reps)
+        const repsResponse = await fetch(`${ZOHO_API_DOMAIN}/crm/v2/Sales_Rep`, {
           headers: { 'Authorization': `Zoho-oauthtoken ${ZOHO_ACCESS_TOKEN}` }
         });
         const repsData = await repsResponse.json();
@@ -255,12 +255,12 @@
           const failed = repLeads.filter(l => l.Lead_Status === 'Failed — Support Needed').length;
           const pending = repLeads.filter(l => l.Lead_Status === 'KYC Submitted').length;
           const total = repLeads.length;
-          const commission = (rep.Commission_Rate || 100) * passed;
+          const commission = (rep.Commission_rate || 100) * passed;
           
           return {
             ...rep,
             passed, conditional, failed, pending, total, commission,
-            designers: repLeads // Store designers for modal view
+            designers: repLeads
           };
         });
         
@@ -282,12 +282,12 @@
           repsListBody.innerHTML += `
             <tr>
               <td><strong>${rep.Rep_ID || '-'}<\/strong></td>
-              <td>${rep.Full_Name || '-'}</td>
+              <td>${rep.Name || rep.Full_Name || '-'}</td>
               <td>${rep.Email || '-'}</td>
               <td>${rep.Phone || '-'}</td>
-              <td>${rep.Territory || '-'}</td>
+              <td>${rep.Territory_of_Work || '-'}</td>
               <td>${rep.Status || '-'}</td>
-              <td>P${rep.Commission_Rate || 0}比
+              <td>P${rep.Commission_rate || 0}比
               <td>P${rep.Total_Commission || 0}比
               <td>P${rep.Commission_Owed || 0}比
               <td>${rep.passed}比
@@ -311,7 +311,7 @@
             <tr class="${rankClass}">
               <td>${idx + 1}</td>
               <td><button class="view-rep-btn" style="background:none; color:#2a5298; text-decoration:underline; padding:0;" onclick='showRepDetails(${JSON.stringify(rep)})'>${rep.Rep_ID || '-'}<\/button></td>
-              <td>${rep.Full_Name || '-'}</td>
+              <td>${rep.Name || rep.Full_Name || '-'}</td>
               <td>${rep.passed}</td>
               <td class="commission">P${rep.commission}</td>
             </tr>
@@ -331,7 +331,7 @@
       const conditional = rep.conditional || 0;
       const failed = rep.failed || 0;
       const pending = rep.pending || 0;
-      const commissionRate = rep.Commission_Rate || 100;
+      const commissionRate = rep.Commission_rate || 100;
       const totalCommission = rep.Total_Commission || 0;
       const commissionPaid = rep.Commission_Paid || 0;
       const commissionOwed = rep.Commission_Owed || 0;
@@ -341,13 +341,11 @@
       if (rep.designers && rep.designers.length > 0) {
         designersHtml = '<div class="designer-list">';
         rep.designers.forEach(designer => {
-          let statusClass = '';
           let statusText = designer.Lead_Status || 'Unknown';
-          if (designer.Lead_Status === 'Fusion Verified') statusClass = '✅ Pass';
-          else if (designer.Lead_Status === 'Conditional Pass') statusClass = '⚠️ Conditional';
-          else if (designer.Lead_Status === 'Failed — Support Needed') statusClass = '❌ Failed';
-          else if (designer.Lead_Status === 'KYC Submitted') statusClass = '⏳ Pending';
-          else statusClass = designer.Lead_Status;
+          if (designer.Lead_Status === 'Fusion Verified') statusText = '✅ Pass';
+          else if (designer.Lead_Status === 'Conditional Pass') statusText = '⚠️ Conditional';
+          else if (designer.Lead_Status === 'Failed — Support Needed') statusText = '❌ Failed';
+          else if (designer.Lead_Status === 'KYC Submitted') statusText = '⏳ Pending';
           
           const firstName = designer.First_Name || '';
           const lastName = designer.Last_Name || '';
@@ -365,7 +363,7 @@
         designersHtml = '<p>No designers onboarded yet.</p>';
       }
       
-      document.getElementById('modalRepName').innerHTML = `${rep.Full_Name || rep.Rep_ID} <span style="font-size:14px; color:#666;">(${rep.Rep_ID})</span>`;
+      document.getElementById('modalRepName').innerHTML = `${rep.Name || rep.Full_Name || rep.Rep_ID} <span style="font-size:14px; color:#666;">(${rep.Rep_ID})</span>`;
       document.getElementById('modalRepDetails').innerHTML = `
         <div class="rep-detail-section">
           <h4>📋 Contact Information</h4>
@@ -379,7 +377,7 @@
           </div>
           <div class="rep-detail-row">
             <div class="rep-detail-label">📍 Territory:</div>
-            <div class="rep-detail-value">${rep.Territory || 'Not set'}</div>
+            <div class="rep-detail-value">${rep.Territory_of_Work || 'Not set'}</div>
           </div>
           <div class="rep-detail-row">
             <div class="rep-detail-label">📅 Status:</div>
