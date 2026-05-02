@@ -50,13 +50,6 @@
       color: #2a5298;
     }
     .stat-label { color: #666; font-size: 13px; margin-top: 4px; }
-    .leaderboard, .reps-table {
-      background: white;
-      border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
     .reps-section {
       background: white;
       border-radius: 20px;
@@ -72,8 +65,8 @@
     .rank-2 { background: #e2e3e5; }
     .rank-3 { background: #d4edda; }
     .commission { font-weight: 600; color: #28a745; }
-    .action-btn, .view-rep-btn {
-      background: #397DFF;
+    .view-rep-btn {
+      background: #28a745;
       color: white;
       border: none;
       padding: 5px 12px;
@@ -81,11 +74,6 @@
       cursor: pointer;
       font-size: 12px;
     }
-    .view-rep-btn {
-      background: #28a745;
-    }
-    .view-rep-btn:hover { background: #1e7e34; }
-    .action-btn:hover { background: #2a5fc0; }
     .modal {
       position: fixed;
       top: 0; left: 0;
@@ -119,38 +107,14 @@
       padding-bottom: 15px;
       border-bottom: 1px solid #eee;
     }
-    .rep-detail-section h4 {
-      margin-bottom: 10px;
-      color: #2a5298;
-    }
-    .rep-detail-row {
-      display: flex;
-      margin-bottom: 8px;
-    }
-    .rep-detail-label {
-      width: 140px;
-      font-weight: 600;
-      color: #666;
-    }
-    .rep-detail-value {
-      flex: 1;
-      color: #1a1a2e;
-    }
-    .designer-list {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    .designer-item {
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-    }
-    .designer-name {
-      font-weight: 600;
-    }
-    .designer-status {
-      font-size: 12px;
-      margin-top: 4px;
-    }
+    .rep-detail-section h4 { margin-bottom: 10px; color: #2a5298; }
+    .rep-detail-row { display: flex; margin-bottom: 8px; }
+    .rep-detail-label { width: 140px; font-weight: 600; color: #666; }
+    .rep-detail-value { flex: 1; color: #1a1a2e; }
+    .designer-list { max-height: 300px; overflow-y: auto; }
+    .designer-item { padding: 10px; border-bottom: 1px solid #eee; }
+    .designer-name { font-weight: 600; }
+    .designer-status { font-size: 12px; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -160,94 +124,68 @@
   </div>
 
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-value" id="totalReps">0</div>
-      <div class="stat-label">Active Reps</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="totalDesigners">0</div>
-      <div class="stat-label">Total Designers</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="totalPassed">0</div>
-      <div class="stat-label">Fusion Verified</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="totalCommissions">P0</div>
-      <div class="stat-label">Total Commission Owed</div>
-    </div>
+    <div class="stat-card"><div class="stat-value" id="totalReps">0</div><div class="stat-label">Active Reps</div></div>
+    <div class="stat-card"><div class="stat-value" id="totalDesigners">0</div><div class="stat-label">Total Designers</div></div>
+    <div class="stat-card"><div class="stat-value" id="totalPassed">0</div><div class="stat-label">Fusion Verified</div></div>
+    <div class="stat-card"><div class="stat-value" id="totalCommissions">P0</div><div class="stat-label">Total Commission Owed</div></div>
   </div>
 
-  <!-- Sales Reps Management Section -->
   <div class="reps-section">
     <h2>👥 Sales Reps Management</h2>
     <div class="table-container" style="overflow-x: auto;">
       <table id="repsListTable">
-        <thead>
-          <tr>
-            <th>Rep ID</th>
-            <th>Full Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Territory</th>
-            <th>Status</th>
-            <th>Commission Rate</th>
-            <th>Total Commission</th>
-            <th>Commission Owed</th>
-            <th>Passed</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="repsListBody">
-          <tr><td colspan="11" class="loading">Loading reps...<\/td><\/tr>
-        <\/tbody>
-      <\/table>
-    <\/div>
-  <\/div>
+        <thead><tr><th>Rep ID</th><th>Full Name</th><th>Email</th><th>Phone</th><th>Territory</th><th>Status</th><th>Commission Rate</th><th>Total Commission</th><th>Commission Owed</th><th>Passed</th><th>Actions</th></tr></thead>
+        <tbody id="repsListBody"><tr><td colspan="11" class="loading">Loading reps...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 
   <div class="leaderboard">
     <h2>🏆 Rep Leaderboard</h2>
     <table id="leaderboardTable">
       <thead><tr><th>Rank</th><th>Rep ID</th><th>Rep Name</th><th>Passed</th><th>Commission</th></tr></thead>
-      <tbody><tr><td colspan="5" class="loading">Loading...<\/td><\/tr><\/tbody>
-    <\/table>
-  <\/div>
+      <tbody id="leaderboardBody"><tr><td colspan="5" class="loading">Loading...</td></tr></tbody>
+    </table>
+  </div>
 
-  <!-- Rep Details Modal -->
   <div id="repModal" style="display:none;" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
       <h3 id="modalRepName"></h3>
       <div id="modalRepDetails"></div>
-    <\/div>
-  <\/div>
+    </div>
+  </div>
 
   <script>
-    // UPDATED: Working access token and correct API endpoint
+    // Working token and API
     const ZOHO_ACCESS_TOKEN = "1000.9634cdb382da090ca84fde3199188244.1d8695a87d7f8a2692181ca1eba6356d";
+    // Use CORS proxy to avoid browser blocking
+    const PROXY = "https://cors-anywhere.herokuapp.com/";
     const ZOHO_API_DOMAIN = "https://www.zohoapis.com";
     
-    // Store full rep data for modal access
     let allRepsData = [];
+    
+    async function fetchAPI(endpoint) {
+      const url = `${PROXY}${ZOHO_API_DOMAIN}/crm/v2/${endpoint}`;
+      const response = await fetch(url, {
+        headers: { 'Authorization': `Zoho-oauthtoken ${ZOHO_ACCESS_TOKEN}` }
+      });
+      return await response.json();
+    }
     
     async function fetchRepsAndLeads() {
       try {
-        // Fetch all reps from Sales Rep module (API name is Sales_Rep, not Sales_Reps)
-        const repsResponse = await fetch(`${ZOHO_API_DOMAIN}/crm/v2/Sales_Rep`, {
-          headers: { 'Authorization': `Zoho-oauthtoken ${ZOHO_ACCESS_TOKEN}` }
-        });
-        const repsData = await repsResponse.json();
+        // Show loading
+        document.getElementById('repsListBody').innerHTML = '<tr><td colspan="11" class="loading">Loading reps...</td></tr>';
+        
+        // Fetch data via proxy
+        const repsData = await fetchAPI('Sales_Rep');
+        const leadsData = await fetchAPI('Leads');
+        
         const reps = repsData.data || [];
+        const allLeads = leadsData.data || [];
         allRepsData = reps;
         
-        // Fetch all leads from Leads module
-        const leadsResponse = await fetch(`${ZOHO_API_DOMAIN}/crm/v2/Leads`, {
-          headers: { 'Authorization': `Zoho-oauthtoken ${ZOHO_ACCESS_TOKEN}` }
-        });
-        const leadsData = await leadsResponse.json();
-        const allLeads = leadsData.data || [];
-        
-        // Calculate stats per rep
         const repStats = reps.map(rep => {
           const repLeads = allLeads.filter(lead => lead.Rep_ID === rep.Rep_ID);
           const passed = repLeads.filter(l => l.Lead_Status === 'Fusion Verified').length;
@@ -256,61 +194,45 @@
           const pending = repLeads.filter(l => l.Lead_Status === 'KYC Submitted').length;
           const total = repLeads.length;
           const commission = (rep.Commission_rate || 100) * passed;
-          
-          return {
-            ...rep,
-            passed, conditional, failed, pending, total, commission,
-            designers: repLeads
-          };
+          return { ...rep, passed, conditional, failed, pending, total, commission, designers: repLeads };
         });
         
-        // Update stats grid
-        const activeReps = reps.filter(r => r.Status === 'Active').length;
-        const totalDesigners = repStats.reduce((sum, r) => sum + r.total, 0);
-        const totalPassed = repStats.reduce((sum, r) => sum + r.passed, 0);
-        const totalCommissions = repStats.reduce((sum, r) => sum + r.commission, 0);
+        // Update stats
+        document.getElementById('totalReps').innerText = reps.filter(r => r.Status === 'Active').length;
+        document.getElementById('totalDesigners').innerText = repStats.reduce((s, r) => s + r.total, 0);
+        document.getElementById('totalPassed').innerText = repStats.reduce((s, r) => s + r.passed, 0);
+        document.getElementById('totalCommissions').innerText = 'P' + repStats.reduce((s, r) => s + r.commission, 0);
         
-        document.getElementById('totalReps').innerText = activeReps;
-        document.getElementById('totalDesigners').innerText = totalDesigners;
-        document.getElementById('totalPassed').innerText = totalPassed;
-        document.getElementById('totalCommissions').innerText = `P${totalCommissions}`;
-        
-        // Populate reps list table
-        const repsListBody = document.getElementById('repsListBody');
-        repsListBody.innerHTML = '';
+        // Populate table
+        const tbody = document.getElementById('repsListBody');
+        tbody.innerHTML = '';
         repStats.forEach(rep => {
-          repsListBody.innerHTML += `
+          tbody.innerHTML += `
             <tr>
-              <td><strong>${rep.Rep_ID || '-'}<\/strong></td>
+              <td><strong>${rep.Rep_ID || '-'}</strong></td>
               <td>${rep.Name || rep.Full_Name || '-'}</td>
               <td>${rep.Email || '-'}</td>
               <td>${rep.Phone || '-'}</td>
               <td>${rep.Territory_of_Work || '-'}</td>
               <td>${rep.Status || '-'}</td>
-              <td>P${rep.Commission_rate || 0}比
-              <td>P${rep.Total_Commission || 0}比
-              <td>P${rep.Commission_Owed || 0}比
-              <td>${rep.passed}比
-              <td>
-                <button class="view-rep-btn" onclick='showRepDetails(${JSON.stringify(rep)})'>📋 View</button>
-              </td>
+              <td>P${rep.Commission_rate || 0}</td>
+              <td>P${rep.Total_Commission || 0}</td>
+              <td>P${rep.Commission_Owed || 0}</td>
+              <td>${rep.passed}</td>
+              <td><button class="view-rep-btn" onclick='showRepDetails(${JSON.stringify(rep)})'>View</button></td>
             </tr>
           `;
         });
         
-        // Leaderboard (sorted by passed)
+        // Leaderboard
         const sorted = [...repStats].sort((a, b) => b.passed - a.passed);
-        const leaderboardBody = document.querySelector('#leaderboardTable tbody');
+        const leaderboardBody = document.getElementById('leaderboardBody');
         leaderboardBody.innerHTML = '';
         sorted.slice(0, 10).forEach((rep, idx) => {
-          let rankClass = '';
-          if (idx === 0) rankClass = 'rank-1';
-          else if (idx === 1) rankClass = 'rank-2';
-          else if (idx === 2) rankClass = 'rank-3';
           leaderboardBody.innerHTML += `
-            <tr class="${rankClass}">
+            <tr>
               <td>${idx + 1}</td>
-              <td><button class="view-rep-btn" style="background:none; color:#2a5298; text-decoration:underline; padding:0;" onclick='showRepDetails(${JSON.stringify(rep)})'>${rep.Rep_ID || '-'}<\/button></td>
+              <td>${rep.Rep_ID || '-'}</td>
               <td>${rep.Name || rep.Full_Name || '-'}</td>
               <td>${rep.passed}</td>
               <td class="commission">P${rep.commission}</td>
@@ -319,12 +241,11 @@
         });
         
       } catch (error) {
-        console.error('Error fetching data:', error);
-        document.getElementById('repsListBody').innerHTML = '<tr><td colspan="11" class="loading">Error loading data. Check API token.<\/td><\/tr>';
+        console.error('Error:', error);
+        document.getElementById('repsListBody').innerHTML = '<tr><td colspan="11" class="loading">Error loading data. Make sure you have activated CORS proxy: <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank">Click here to activate</a></td></tr>';
       }
     }
     
-    // Show detailed rep information in modal
     function showRepDetails(rep) {
       const totalDesigners = rep.designers ? rep.designers.length : rep.total || 0;
       const passed = rep.passed || 0;
@@ -336,7 +257,6 @@
       const commissionPaid = rep.Commission_Paid || 0;
       const commissionOwed = rep.Commission_Owed || 0;
       
-      // Build designers list HTML
       let designersHtml = '';
       if (rep.designers && rep.designers.length > 0) {
         designersHtml = '<div class="designer-list">';
@@ -346,17 +266,10 @@
           else if (designer.Lead_Status === 'Conditional Pass') statusText = '⚠️ Conditional';
           else if (designer.Lead_Status === 'Failed — Support Needed') statusText = '❌ Failed';
           else if (designer.Lead_Status === 'KYC Submitted') statusText = '⏳ Pending';
-          
           const firstName = designer.First_Name || '';
           const lastName = designer.Last_Name || '';
           const fullName = `${firstName} ${lastName}`.trim() || '—';
-          
-          designersHtml += `
-            <div class="designer-item">
-              <div class="designer-name">${fullName}</div>
-              <div class="designer-status">${statusText} | Score: ${designer.Fusion_Verified_Score || '—'} | Commission: ${designer.Lead_Status === 'Fusion Verified' ? `P${commissionRate}` : '—'}</div>
-            </div>
-          `;
+          designersHtml += `<div class="designer-item"><div class="designer-name">${fullName}</div><div class="designer-status">${statusText} | Score: ${designer.Fusion_Verified_Score || '—'}</div></div>`;
         });
         designersHtml += '</div>';
       } else {
@@ -365,92 +278,38 @@
       
       document.getElementById('modalRepName').innerHTML = `${rep.Name || rep.Full_Name || rep.Rep_ID} <span style="font-size:14px; color:#666;">(${rep.Rep_ID})</span>`;
       document.getElementById('modalRepDetails').innerHTML = `
-        <div class="rep-detail-section">
-          <h4>📋 Contact Information</h4>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">📧 Email:</div>
-            <div class="rep-detail-value">${rep.Email || 'Not set'}</div>
-          </div>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">📱 Phone:</div>
-            <div class="rep-detail-value">${rep.Phone || 'Not set'}</div>
-          </div>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">📍 Territory:</div>
-            <div class="rep-detail-value">${rep.Territory_of_Work || 'Not set'}</div>
-          </div>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">📅 Status:</div>
-            <div class="rep-detail-value">${rep.Status || 'Active'}</div>
-          </div>
+        <div class="rep-detail-section"><h4>Contact Information</h4>
+          <div class="rep-detail-row"><div class="rep-detail-label">Email:</div><div class="rep-detail-value">${rep.Email || 'Not set'}</div></div>
+          <div class="rep-detail-row"><div class="rep-detail-label">Phone:</div><div class="rep-detail-value">${rep.Phone || 'Not set'}</div></div>
+          <div class="rep-detail-row"><div class="rep-detail-label">Territory:</div><div class="rep-detail-value">${rep.Territory_of_Work || 'Not set'}</div></div>
+          <div class="rep-detail-row"><div class="rep-detail-label">Status:</div><div class="rep-detail-value">${rep.Status || 'Active'}</div></div>
         </div>
-        
-        <div class="rep-detail-section">
-          <h4>💰 Commission Information</h4>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">Commission Rate:</div>
-            <div class="rep-detail-value">P${commissionRate} per pass</div>
-          </div>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">Total Commission Earned:</div>
-            <div class="rep-detail-value">P${totalCommission}</div>
-          </div>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">Commission Paid:</div>
-            <div class="rep-detail-value">P${commissionPaid}</div>
-          </div>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">Commission Owed:</div>
-            <div class="rep-detail-value"><strong style="color:#28a745;">P${commissionOwed}</strong></div>
-          </div>
+        <div class="rep-detail-section"><h4>Commission Information</h4>
+          <div class="rep-detail-row"><div class="rep-detail-label">Commission Rate:</div><div class="rep-detail-value">P${commissionRate} per pass</div></div>
+          <div class="rep-detail-row"><div class="rep-detail-label">Total Commission Earned:</div><div class="rep-detail-value">P${totalCommission}</div></div>
+          <div class="rep-detail-row"><div class="rep-detail-label">Commission Paid:</div><div class="rep-detail-value">P${commissionPaid}</div></div>
+          <div class="rep-detail-row"><div class="rep-detail-label">Commission Owed:</div><div class="rep-detail-value"><strong style="color:#28a745;">P${commissionOwed}</strong></div></div>
         </div>
-        
-        <div class="rep-detail-section">
-          <h4>📊 Performance Summary</h4>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">Total Designers:</div>
-            <div class="rep-detail-value">${totalDesigners}</div>
-          </div>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">✅ Fusion Verified (Passed):</div>
-            <div class="rep-detail-value" style="color: green;">${passed}</div>
-          </div>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">⚠️ Conditional Pass:</div>
-            <div class="rep-detail-value" style="color: orange;">${conditional}</div>
-          </div>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">❌ Failed — Support Needed:</div>
-            <div class="rep-detail-value" style="color: red;">${failed}</div>
-          </div>
-          <div class="rep-detail-row">
-            <div class="rep-detail-label">⏳ KYC Pending:</div>
-            <div class="rep-detail-value">${pending}</div>
-          </div>
+        <div class="rep-detail-section"><h4>Performance Summary</h4>
+          <div class="rep-detail-row"><div class="rep-detail-label">Total Designers:</div><div class="rep-detail-value">${totalDesigners}</div></div>
+          <div class="rep-detail-row"><div class="rep-detail-label">Passed:</div><div class="rep-detail-value" style="color:green;">${passed}</div></div>
+          <div class="rep-detail-row"><div class="rep-detail-label">Conditional:</div><div class="rep-detail-value" style="color:orange;">${conditional}</div></div>
+          <div class="rep-detail-row"><div class="rep-detail-label">Failed:</div><div class="rep-detail-value" style="color:red;">${failed}</div></div>
+          <div class="rep-detail-row"><div class="rep-detail-label">Pending:</div><div class="rep-detail-value">${pending}</div></div>
         </div>
-        
-        <div class="rep-detail-section">
-          <h4>📋 Designers Onboarded (${totalDesigners})</h4>
-          ${designersHtml}
-        </div>
+        <div class="rep-detail-section"><h4>Designers Onboarded (${totalDesigners})</h4>${designersHtml}</div>
       `;
-      
       document.getElementById('repModal').style.display = 'flex';
     }
     
-    function closeModal() {
-      document.getElementById('repModal').style.display = 'none';
-    }
+    function closeModal() { document.getElementById('repModal').style.display = 'none'; }
+    function logout() { localStorage.removeItem('adminAuth'); window.location.href = 'admin-login.html'; }
     
-    function logout() {
-      localStorage.removeItem('adminAuth');
-      window.location.href = 'admin-login.html';
-    }
-    
-    // Check auth
+    // Check auth and activate CORS proxy
     if (!localStorage.getItem('adminAuth')) {
       window.location.href = 'admin-login.html';
     } else {
+      // Show instructions if CORS proxy not activated
       fetchRepsAndLeads();
     }
   </script>
